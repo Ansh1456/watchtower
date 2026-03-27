@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: watchtower
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn watchtower.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"

@@ -1,0 +1,118 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Dashboard — Watchtower{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <div>
+      <h2>System Dashboard</h2>
+      <p>Real-time metrics for your infrastructure</p>
+    </div>
+    <a href="{% url 'export_csv' %}" class="btn btn-outline">
+      ↓ Export CSV
+    </a>
+  </div>
+</div>
+
+<!-- METRIC CARDS -->
+<div class="metric-grid">
+  <!-- CPU -->
+  <div class="metric-card" style="--accent-color: #00d4ff;">
+    <div class="metric-label"><span class="dot"></span>CPU Usage</div>
+    <div class="metric-value" id="cpu-val">{{ metrics.cpu }}<span>%</span></div>
+    <div class="metric-bar-bg">
+      <div class="metric-bar-fill" id="cpu-bar" style="width:{{ metrics.cpu }}%"></div>
+    </div>
+    <div class="metric-status" id="cpu-status">
+      {% if metrics.cpu < 50 %}Normal{% elif metrics.cpu < 75 %}Moderate{% else %}High{% endif %}
+    </div>
+  </div>
+
+  <!-- RAM -->
+  <div class="metric-card" style="--accent-color: #7c3aed;">
+    <div class="metric-label"><span class="dot"></span>RAM Usage</div>
+    <div class="metric-value" id="ram-val">{{ metrics.ram }}<span>%</span></div>
+    <div class="metric-bar-bg">
+      <div class="metric-bar-fill" id="ram-bar" style="width:{{ metrics.ram }}%"></div>
+    </div>
+    <div class="metric-status" id="ram-status">
+      {% if metrics.ram < 50 %}Normal{% elif metrics.ram < 75 %}Moderate{% else %}High{% endif %}
+    </div>
+  </div>
+
+  <!-- DISK -->
+  <div class="metric-card" style="--accent-color: #10b981;">
+    <div class="metric-label"><span class="dot"></span>Disk Usage</div>
+    <div class="metric-value" id="disk-val">{{ metrics.disk }}<span>%</span></div>
+    <div class="metric-bar-bg">
+      <div class="metric-bar-fill" id="disk-bar" style="width:{{ metrics.disk }}%"></div>
+    </div>
+    <div class="metric-status" id="disk-status">
+      {% if metrics.disk < 50 %}Normal{% elif metrics.disk < 75 %}Moderate{% else %}High{% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-title">
+      CPU & RAM History
+      <span class="live-badge">Live</span>
+    </div>
+    <div style="height:220px;">
+      <canvas id="lineChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Current Distribution</div>
+    <div style="height:220px;">
+      <canvas id="donutChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- INFO ROW -->
+<div class="card" style="display:flex;gap:40px;align-items:center;">
+  <div>
+    <div style="font-size:11px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Logged in as</div>
+    <div style="font-size:15px;font-weight:600;">{{ user.username }}</div>
+  </div>
+  <div>
+    <div style="font-size:11px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Role</div>
+    <div>
+      {% if user.is_staff %}
+      <span class="badge badge-purple">Administrator</span>
+      {% else %}
+      <span class="badge badge-blue">User</span>
+      {% endif %}
+    </div>
+  </div>
+  <div>
+    <div style="font-size:11px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Update interval</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--accent3);">3s</div>
+  </div>
+  <div style="margin-left:auto;">
+    <span class="live-badge" style="font-size:12px;padding:5px 12px;">Monitoring Active</span>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% load static %}
+<script src="{% static 'js/dashboard.js' %}"></script>
+<script>
+  const cpuHistory  = {{ metrics.cpu_history|safe }};
+  const ramHistory  = {{ metrics.ram_history|safe }};
+  const cpu  = {{ metrics.cpu }};
+  const ram  = {{ metrics.ram }};
+  const disk = {{ metrics.disk }};
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initLineChart(cpuHistory, ramHistory);
+    initDonutChart(cpu, ram, disk);
+    startLiveUpdates();
+  });
+</script>
+{% endblock %}

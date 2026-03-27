@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Watchtower{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🗼</div>
+    <h1>Watchtower</h1>
+    <p>v1.0 — monitoring</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <a href="{% url 'dashboard' %}" class="nav-item {% block nav_dashboard %}{% endblock %}">
+      <span class="icon">⬡</span> Dashboard
+    </a>
+
+    {% if user.is_staff %}
+    <div class="nav-label">Admin</div>
+    <a href="{% url 'admin_panel' %}" class="nav-item {% block nav_admin %}{% endblock %}">
+      <span class="icon">⊞</span> User Management
+    </a>
+    {% endif %}
+
+    <div class="nav-label">Data</div>
+    <a href="{% url 'export_csv' %}" class="nav-item">
+      <span class="icon">↓</span> Export CSV
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="{% url 'logout' %}" class="user-chip">
+      <div class="user-avatar">{{ user.username|first|upper }}</div>
+      <div>
+        <div style="font-size:13px;color:#e2e8f0;font-weight:600;">{{ user.username }}</div>
+        <div style="font-size:11px;">Sign out →</div>
+      </div>
+    </a>
+  </div>
+</aside>
+
+<main class="main-content">
+  {% if messages %}
+  <div class="messages-box" style="margin-bottom:20px;">
+    {% for msg in messages %}
+    <div class="alert alert-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

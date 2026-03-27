@@ -1,0 +1,91 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Admin Panel — Watchtower{% endblock %}
+{% block nav_admin %}active{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h2>User Management</h2>
+  <p>Overview of all registered users and system statistics</p>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-n" style="color:var(--accent);">{{ total_users }}</div>
+    <div class="stat-label">Total Users</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-n" style="color:#10b981;">{{ verified_users }}</div>
+    <div class="stat-label">Verified Users</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-n" style="color:#7c3aed;">{{ staff_users }}</div>
+    <div class="stat-label">Administrators</div>
+  </div>
+</div>
+
+<!-- USER TABLE -->
+<div class="card table-card">
+  <div style="padding:20px 20px 0;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-size:13px;font-weight:600;color:var(--text-sec);text-transform:uppercase;letter-spacing:1px;">
+      All Users
+    </div>
+    <span class="badge badge-blue">{{ total_users }} total</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Verified</th>
+        <th>Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in user_data %}
+      <tr>
+        <td style="color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:12px;">
+          {{ forloop.counter }}
+        </td>
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="user-avatar" style="width:30px;height:30px;font-size:13px;">
+              {{ item.user.username|first|upper }}
+            </div>
+            <span style="font-weight:600;">{{ item.user.username }}</span>
+          </div>
+        </td>
+        <td style="color:var(--text-sec);">{{ item.user.email|default:"—" }}</td>
+        <td>
+          {% if item.user.is_superuser %}
+            <span class="badge badge-purple">Superuser</span>
+          {% elif item.user.is_staff %}
+            <span class="badge badge-blue">Staff</span>
+          {% else %}
+            <span class="badge" style="background:rgba(100,116,139,0.1);color:var(--text-sec);">User</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if item.verified %}
+            <span class="badge badge-green">✓ Verified</span>
+          {% else %}
+            <span class="badge badge-yellow">⏳ Pending</span>
+          {% endif %}
+        </td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-sec);">
+          {{ item.user.date_joined|date:"d M Y" }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px;">
+          No users found.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
