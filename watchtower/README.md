@@ -1,4 +1,4 @@
-# 🗼 Watchtower — System Monitoring Dashboard
+   Watchtower — System Monitoring Dashboard
 
 A clean, minimal system monitoring prototype built with Django + Chart.js.
 
